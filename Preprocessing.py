@@ -1,5 +1,8 @@
 import pandas as pd
 import numpy as np
+import simfin as sf
+# Import names used for easy access to SimFin's data-columns.
+from simfin.names import *
 
 
 StocksSymbol = ["LOW","BJ","FND","ORLY","CVNA","ALL" ,"PGR","TRV","DHI","LEN"]
@@ -31,7 +34,8 @@ class PreProcess():
         refresh_days_shareprices = 10
 
         self.stockfin = sf.load_shareprices(variant='daily', market=market, index=['Ticker'])
-        self.stockfin = self.stockfin.loc[StocksSymbol]["Open"]
+
+        self.stockfin = self.stockfin.loc[StocksSymbol]
         for i, name in enumerate(self.file["name"]):
             if name == "Unnamed":
                 self.file["name"][i] = "Unnamed" + str(i)
@@ -40,22 +44,26 @@ class PreProcess():
         self.file["date"] = self.file.apply(lambda x: f(x["date"], x["year"]), axis=1)
         # for date, h_year, index in zip(self.file["date"], self.file["year"], range(0, len(self.file["date"].unique()))):
         #     self.file["date"][index] = date.replace(year=h_year)
-        numOfStocks = len(ColsToInsert) ; numOfHurr = len(self.file["date"].unique())
-        finalPD = pd.DataFrame(np.zeros((numOfStocks *numOfHurr, numOfStocks)),columns=ColsToInsert)
+        numOfStocks = len(ColsToInsert); numOfHurr = len(self.file["date"].unique())
+        finalPD = pd.DataFrame(np.zeros((numOfStocks *numOfHurr, numOfStocks)), columns=ColsToInsert)
 
-        index = 0
         for i, row in self.file.iterrows():
             for symbol in StocksSymbol:
+                if self.dateExists(row["date"], row["name"]):
+                    new_row = {"Hurricane": row["name"], "Category": row["category"], "Date": row["date"], "Stock": symbol,
+                               "7change": self.calcChange(row["date"], 7, row["name"]), "20change": self.calcChange(row["date"], 20, row["name"]),
+                               "30change": self.calcChange(row["date"], 30, row["name"]), "50change": self.calcChange(row["date"], 40, row["name"])}
+                    finalPD = finalPD.append(new_row, ignore_index=True)
 
-                new_row = {"Hurricane": row["name"],"Category": row["category"],"Date":row["date"],"Stock":symbol,"7change":calcChange(row["date"],7,row["name"]), "20change" : calcChange(row["date"],20,row["name"]) ,"30change" : calcChange(row["date"],30,row["name"]),"50change": calcChange(row["date"],30,row["name"])}
-                finalPD = finalPD.append(new_row, ignore_index=True)
+        print("hasbulla the hero")
 
     def calcChange(self, date, days, stock):
-        dateVal = self.stockfin[(self.stockfin["stock"] == stock) & (self.stockfin["Date"] == date)]["open"]
-        laterVal = self.stockfin[(self.stockfin["stock"] == stock) & (self.stockfin["Date"] == date + days)]["open"]
+        dateVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%m/%d/%Y"))]["open"]
+        laterVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == (date.getDate() + days).strftime("%m/%d/%Y"))]["open"]
         return ((laterVal-dateVal)/dateVal)*100
 
-
+    def dateExists(self, date, stock):
+        return len(self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%dm/%d/%Y"))]) != 0
 
 
 
