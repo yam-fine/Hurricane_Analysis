@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import simfin as sf
+from datetime import datetime, date, timedelta
+
 # Import names used for easy access to SimFin's data-columns.
 from simfin.names import *
 
@@ -34,8 +36,9 @@ class PreProcess():
         refresh_days_shareprices = 10
 
         self.stockfin = sf.load_shareprices(variant='daily', market=market, index=['Ticker'])
-
         self.stockfin = self.stockfin.loc[StocksSymbol]
+        self.stockfin['Date'] = self.stockfin['Date'].apply(lambda x: x.strftime("%d/%m/%Y"))
+
         for i, name in enumerate(self.file["name"]):
             if name == "Unnamed":
                 self.file["name"][i] = "Unnamed" + str(i)
@@ -47,23 +50,27 @@ class PreProcess():
         numOfStocks = len(ColsToInsert); numOfHurr = len(self.file["date"].unique())
         finalPD = pd.DataFrame(np.zeros((numOfStocks *numOfHurr, numOfStocks)), columns=ColsToInsert)
 
+        self.stockfin['Date'] = pd.to_datetime(self.stockfin['Date'])
+        self.stockfin['Date'] = self.stockfin['Date'].apply(lambda x: x.strftime("%m/%d/%Y"))
         for i, row in self.file.iterrows():
             for symbol in StocksSymbol:
-                if self.dateExists(row["date"], row["name"]):
-                    new_row = {"Hurricane": row["name"], "Category": row["category"], "Date": row["date"], "Stock": symbol,
-                               "7change": self.calcChange(row["date"], 7, row["name"]), "14change": self.calcChange(row["date"], 14, row["name"]),
-                               "28change": self.calcChange(row["date"], 28, row["name"]), "56change": self.calcChange(row["date"], 56, row["name"])}
+                if self.dateExists(row["date"], symbol):
+                    new_row = {"hurricane": row["name"], "category": row["category"], "date": row["date"], "stock": symbol,
+                               "7change": self.calcChange(row["date"], 7, symbol), "14change": self.calcChange(row["date"], 14, symbol),
+                               "28change": self.calcChange(row["date"], 28, symbol), "56change": self.calcChange(row["date"], 56, symbol)}
                     finalPD = finalPD.append(new_row, ignore_index=True)
 
         print("hasbulla the hero")
 
     def calcChange(self, date, days, stock):
-        dateVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%m/%d/%Y"))]["open"]
-        laterVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == (date.getDate() + days).strftime("%m/%d/%Y"))]["open"]
-        return ((laterVal-dateVal)/dateVal)*100
+        dateVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%m/%d/%Y"))]["Open"]
+        laterVal = self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == (date + timedelta(days=3)).strftime("%m/%d/%Y"))]["Open"]
+        return (((laterVal-dateVal)/dateVal)*100)[0]
 
     def dateExists(self, date, stock):
-        if len(self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%m/%d/%Y"))]) != 0:
+        var1 = stock
+        var2 = date.strftime("%m/%d/%Y")
+        if ((self.stockfin.index == var1) & (self.stockfin['Date'] == var2)).any():
             return True
         return False
 
