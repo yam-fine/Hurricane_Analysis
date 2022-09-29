@@ -1,0 +1,23 @@
+Hurricane (Ian)
+
+1 .Find sectors that may be affected and explain reason why:
+Aerospace - regional company may abort flights for the current week + airport could be destroyed
+Construction - Depending on the amount of rubble, the state/people will require construction services
+Transportation- Someone will have to transport all the logistics
+
+2.from the sectors above find companies that related to the region - Florida/Georgie/South+North Carolina
+Stocks symbol- LOW,BJ,FND,ORLY,CVNA*,ALL ,PGR,TRV,DHI,LEN
+
+3.create DB of huricanes (name/Category/date)
+
+4.find stocks change(percentage) in period of week month and untill earnings release
+DF should look like:cols(huricane,category,huricane date,symbol, change per1..2..3)
+
+5.Calculate for each Category separately average change and Variance
+
+6. try logistic reggresion / SVM
+
+
+
+Ideas:
+pre huricane impact - HD stock
