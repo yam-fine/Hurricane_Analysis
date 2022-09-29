@@ -6,7 +6,7 @@ from simfin.names import *
 
 
 StocksSymbol = ["LOW","BJ","FND","ORLY","CVNA","ALL" ,"PGR","TRV","DHI","LEN"]
-ColsToInsert = ["hurricane","category","date","stock","7change", "20change","30change","50change"]
+ColsToInsert = ["hurricane","category","date","stock","7change", "14change","28change","56change"]
 
 class PreProcess():
     def __init__(self, path):
@@ -51,8 +51,8 @@ class PreProcess():
             for symbol in StocksSymbol:
                 if self.dateExists(row["date"], row["name"]):
                     new_row = {"Hurricane": row["name"], "Category": row["category"], "Date": row["date"], "Stock": symbol,
-                               "7change": self.calcChange(row["date"], 7, row["name"]), "20change": self.calcChange(row["date"], 20, row["name"]),
-                               "30change": self.calcChange(row["date"], 30, row["name"]), "50change": self.calcChange(row["date"], 40, row["name"])}
+                               "7change": self.calcChange(row["date"], 7, row["name"]), "14change": self.calcChange(row["date"], 14, row["name"]),
+                               "28change": self.calcChange(row["date"], 28, row["name"]), "56change": self.calcChange(row["date"], 56, row["name"])}
                     finalPD = finalPD.append(new_row, ignore_index=True)
 
         print("hasbulla the hero")
@@ -63,7 +63,9 @@ class PreProcess():
         return ((laterVal-dateVal)/dateVal)*100
 
     def dateExists(self, date, stock):
-        return len(self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%dm/%d/%Y"))]) != 0
+        if len(self.stockfin[(self.stockfin.index == stock) & (self.stockfin["Date"] == date.strftime("%m/%d/%Y"))]) != 0:
+            return True
+        return False
 
 
 
