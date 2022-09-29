@@ -6,12 +6,14 @@ Construction - Depending on the amount of rubble, the state/people will require 
 Transportation- Someone will have to transport all the logistics
 
 2.from the sectors above find companies that related to the region - Florida/Georgie/South+North Carolina
-Stocks symbol- LOW,BJ,FND,ORLY,CVNA*,ALL ,PGR,TRV,DHI,LEN
+Stocks symbol- LOW,BJ,FND,ORLY,CVNA,ALL ,PGR,TRV,DHI,LEN
 
 3.create DB of huricanes (name/Category/date)
 
 4.find stocks change(percentage) in period of week month and untill earnings release
-DF should look like:cols(huricane,category,huricane date,symbol, change per1..2..3)
+DF should look like:cols(hurricane,category,hurricane date,symbol, change per1..2..3)
+
+DF size: is columns * (hurricane*symbols)
 
 5.Calculate for each Category separately average change and Variance
 
