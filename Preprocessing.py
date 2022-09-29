@@ -8,7 +8,30 @@ ColsToInsert = ["hurricane","category","date","stock","7change", "20change","30c
 class PreProcess():
     def __init__(self, path):
         self.file = pd.ExcelFile(path).parse('Sheet1')
-        self.stockfin =.....
+
+        sf.set_data_dir('~/simfin_data/')
+        # # Replace YOUR_API_KEY with your actual API-key.
+        sf.set_api_key(api_key='NmFN8XBW6Se0bGezCbgvREZzWfKbVUWl')
+        # self.df_income = sf.load_income(variant='annual', market='us')
+
+        # We are interested in the US stock-market.
+        market = 'us'
+
+        # Add this date-offset to the fundamental data such as
+        # Income Statements etc., because the REPORT_DATE is not
+        # when it was actually made available to the public,
+        # which can be 1, 2 or even 3 months after the Report Date.
+        offset = pd.DateOffset(days=60)
+
+        # Refresh the fundamental datasets (Income Statements etc.)
+        # every 30 days.
+        refresh_days = 30
+
+        # Refresh the dataset with shareprices every 10 days.
+        refresh_days_shareprices = 10
+
+        self.stockfin = sf.load_shareprices(variant='daily', market=market, index=['Ticker'])
+        self.stockfin = self.stockfin.loc[StocksSymbol]["Open"]
         for i, name in enumerate(self.file["name"]):
             if name == "Unnamed":
                 self.file["name"][i] = "Unnamed" + str(i)
