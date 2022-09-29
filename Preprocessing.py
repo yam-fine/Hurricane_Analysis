@@ -48,7 +48,7 @@ class PreProcess():
         # for date, h_year, index in zip(self.file["date"], self.file["year"], range(0, len(self.file["date"].unique()))):
         #     self.file["date"][index] = date.replace(year=h_year)
         numOfStocks = len(ColsToInsert); numOfHurr = len(self.file["date"].unique())
-        finalPD = pd.DataFrame(np.zeros((numOfStocks *numOfHurr, numOfStocks)), columns=ColsToInsert)
+        finalPD = pd.DataFrame(columns=ColsToInsert)
 
         self.stockfin['Date'] = pd.to_datetime(self.stockfin['Date'])
         self.stockfin['Date'] = self.stockfin['Date'].apply(lambda x: x.strftime("%m/%d/%Y"))
