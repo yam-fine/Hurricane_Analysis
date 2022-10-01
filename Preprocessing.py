@@ -75,9 +75,6 @@ class PreProcess():
         return False
 
 
-
-
-
     def get_file(self):
         return self.file
 
